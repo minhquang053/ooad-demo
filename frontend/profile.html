@@ -1,0 +1,197 @@
+<!-- Similar to the auction.html file structure -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        /* Custom styling for the navbar */
+        body {
+            padding-top: 56px; /* Adjust the top padding based on your navbar height */
+        }
+
+        .navbar {
+            background-color: #3498db; /* Set your desired background color */
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: #ffffff; /* Set the text color */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff; /* Set the text color */
+        }
+
+        /* Added style for the compact form */
+        #profileForm {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Hide the form initially */
+        #profileFormContainer {
+            display: none;
+        }
+
+        /* Style for the Edit button */
+        #editProfileButton {
+            float: right;
+            margin-right: 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <a class="navbar-brand" href="/">Group 2</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Add a dropdown menu with a user icon -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user"></i> <!-- FontAwesome user icon -->
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="profile.html">My Profile</a>
+                        <a class="dropdown-item" href="my-bids.html">My Bids</a>
+                        <a class="dropdown-item" href="my-auctions.html">My Auctions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="login.html" onclick="logout()">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav> 
+
+    <div class="container mt-4">
+        <!-- Edit button on the same line as "User Profile" and above the top right corner of the user details -->
+        <h2>User Profile <button id="editProfileButton" class="btn btn-primary" onclick="editProfile()">Edit</button></h2>
+        
+        <!-- Display user details -->
+        <div id="profileDetailsContainer">
+            <!-- User details will be dynamically added here using JavaScript -->
+        </div>
+
+        <!-- Editable form fields -->
+        <div id="profileFormContainer">
+            <form id="profileForm" onsubmit="saveChanges(); return false;">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="introduction">Introduction:</label>
+                    <textarea class="form-control" id="introduction" name="introduction" rows="3" readonly required></textarea>
+                </div>
+                <!-- Save Changes and Cancel buttons -->
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary ml-2" onclick="cancelEdit()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="profile.js"></script> <!-- Add this script for dynamic content -->
+
+    <script>
+        function logout() {
+            // Remove the JWT token from local storage
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('uid');
+
+            // Implement any additional logout logic here, such as redirecting to the login page
+            console.log('Logout clicked');
+            // Redirect to the login page or perform any other necessary actions
+        }
+
+        function editProfile() {
+            // Hide the profile details and show the editable form
+            document.getElementById('profileDetailsContainer').style.display = 'none';
+            document.getElementById('profileFormContainer').style.display = 'block';
+            document.getElementById('editProfileButton').style.display ='none';
+
+            // Enable the readonly attribute for editing
+            document.getElementById('name').readOnly = false;
+            document.getElementById('email').readOnly = false;
+            document.getElementById('phone').readOnly = false;
+            document.getElementById('introduction').readOnly = false;
+        }
+
+        function saveChanges() {
+            // Implement logic to save changes to the server
+            // You can use AJAX or any other method to send the updated data to the server
+            // After saving, hide the form and show the profile details
+            document.getElementById('profileDetailsContainer').style.display = 'block';
+            document.getElementById('profileFormContainer').style.display = 'none';
+            document.getElementById('editProfileButton').style.display ='block';
+
+            // Set the form fields back to readonly
+            document.getElementById('name').readOnly = true;
+            document.getElementById('email').readOnly = true;
+            document.getElementById('phone').readOnly = true;
+            document.getElementById('introduction').readOnly = true;
+
+            const profileForm = document.getElementById('profileForm');
+            const formData = new FormData(profileForm);
+            const apiUrl = `http://localhost:3000/v1/users/${localStorage.getItem('uid')}`;
+
+            fetch(apiUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data
+                console.log('Edit Successful:', data);
+                window.location.href = 'http://localhost:8000/profile.html';
+            })
+            .catch(error => {
+                console.error('Login Error:', error);
+            });
+        }
+
+        function cancelEdit() {
+            // If the user cancels the edit, hide the form and show the profile details
+            document.getElementById('profileDetailsContainer').style.display = 'block';
+            document.getElementById('profileFormContainer').style.display = 'none';
+            document.getElementById('editProfileButton').style.display ='block';
+
+            // Set the form fields back to readonly
+            document.getElementById('name').readOnly = true;
+            document.getElementById('email').readOnly = true;
+            document.getElementById('phone').readOnly = true;
+            document.getElementById('introduction').readOnly = true;
+        }
+    </script>
+</body>
+</html>
