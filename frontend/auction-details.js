@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     try {
         const auction = await fetchAuction(getAuctionIdFromUrl());
-
-        localStorage.setItem('auctionId', auction.auctionId);
+        const viewerId = localStorage.getItem('uid');
+        localStorage.setItem('auctionId', auction.auctionId);      
 
         var container = document.createElement('div');
         container.className = 'container mt-4';
@@ -48,6 +48,22 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
 
+        // Create the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.id = 'deleteAuctionBtn';
+        deleteButton.className = 'btn btn-danger float-right mt-3 mr-2'; // Adjust margins as needed
+        deleteButton.textContent = 'Delete Auction';
+        deleteButton.style.display = 'none'; // Initially hide the delete button
+        container.appendChild(deleteButton);
+
+        if (viewerId === '1' || viewerId === auction.userId) {
+            deleteButton.style.display = 'block';
+            deleteButton.addEventListener('click', async function() {
+                await deleteAuction(localStorage.getItem('auctionId'));
+                window.location.href = 'http://localhost:8000/';
+            });
+        }
+
         // Display the current highest bid container
         var highestBidContainer = document.createElement('div');
         highestBidContainer.id = 'highestBidContainer';
@@ -74,11 +90,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         card.className = 'card mt-3';
         card.innerHTML = `
             <div class="card-body">
-                <img src="${auction.imageUrl}" class="card-img-top mx-auto d-block" alt="image" class="img-fluid">
+                <img src="${auction.imageUrl}" class="card-img-top mx-auto d-block img-fluid" style="max-height: 500px; width: auto;" alt="image">
                 <br>
                 <p class="card-text">Auction ID: ${auction.auctionId}</p>
                 <p class="card-text"><a href="profile.html?id=${auction.userId}">User ID: ${auction.userId}</a></p>
                 <p class="card-text">Category: ${auction.category}</p>
+                <p class="card-text">Initial price: ${auction.initPrice} $</p>
                 <p class="card-text">Description: ${auction.description}</p>
             </div>
         `;
@@ -145,9 +162,11 @@ async function fetchHighestBid(auctionId) {
         }
 
         const data = await response.json();
-
-        // Update the displayed highest bid value
-        document.getElementById('highestBidValue').textContent = `$${data.price}`;
+        if (!data.price) {
+            document.getElementById('highestBidValue').textContent = `No bid has been made`;
+        } else {
+            document.getElementById('highestBidValue').textContent = `$${data.price}`;
+        }
     } catch (error) {
         console.error('Error fetching highest bid:', error);
     }
@@ -187,4 +206,35 @@ async function placeBid(auctionId, bidPrice) {
     } catch (error) {
         console.error('Error fetching highest bid:', error);
     }
+}
+
+async function deleteAuction(auctionId) {
+    const apiUrl = `http://localhost:3000/v1/auctions/${auctionId}`;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('jwtToken')
+    };
+
+    return fetch(apiUrl, {
+        method: 'DELETE',
+        headers: headers,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Handle the auction data
+        console.log('Auction Data:', data);
+        // Implement logic to display or process the auction data as needed
+        return data;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Implement error handling as needed
+        throw error;
+    });
 }

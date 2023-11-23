@@ -3,6 +3,7 @@ const {
     getAuctionById,
     approveAuctionById,
     createNewAuction,
+    deleteAuctionById,
 } = require('../../models/auctions.model');
 
 const {
@@ -69,9 +70,29 @@ async function httpAddNewAuction(req, res) {
     return res.status(201).json(auction);
 }
 
+async function httpDeleteAuctionById(req, res) {
+    const userId = req.uid;
+    const auctionId = req.params.id;
+
+    const requestingUser = await getUserById(userId);
+    const deletingAuction = await getAuctionById(auctionId);
+
+    if (requestingUser.isAdmin || requestingUser.userId == deletingAuction.userId) {
+        const auction = await deleteAuctionById(auctionId);
+        return res.status(200).json(auction);
+    } else {
+        console.log(requestingUser.userId);
+        console.log(deletingAuction.userId);
+        return res.status(400).json({
+            error: "Unauthorized user"
+        })
+    }
+}
+
 module.exports = {
     httpGetAllAuctions,
     httpGetAuctionById,
     httpAddNewAuction,
     httpApproveAuctionById,
+    httpDeleteAuctionById,
 }

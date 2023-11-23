@@ -66,9 +66,15 @@ async function createNewAuction(auction) {
     return newAuction;
 }
 
+async function deleteAuctionById(auctionId) {
+    const auction = Auction.findOneAndDelete({ auctionId: auctionId });
+    return auction;
+}
+
 module.exports = {
     getAllAuctions,
     getAuctionById,
     approveAuctionById,
     createNewAuction,
+    deleteAuctionById,
 }
