@@ -39,12 +39,16 @@ document.addEventListener('DOMContentLoaded', async function() {
                 window.location.href = 'http://localhost:8000/login.html';
             } else {
                 const bidPrice = prompt('Enter your bid price:');
+                
+                if (Number(bidPrice) < Number(auction.initPrice)) {
+                    alert("Your bid must be higher than the inital price");
+                } else {
+                    // Call a function to place a bid with the specified price
+                    await placeBid(localStorage.getItem('auctionId'), bidPrice);
 
-                // Call a function to place a bid with the specified price
-                await placeBid(localStorage.getItem('auctionId'), bidPrice);
-
-                // After placing a bid, update the displayed highest bid
-                await fetchHighestBid(localStorage.getItem('auctionId'));
+                    // After placing a bid, update the displayed highest bid
+                    await fetchHighestBid(localStorage.getItem('auctionId'));
+                }
             }
         });
 
